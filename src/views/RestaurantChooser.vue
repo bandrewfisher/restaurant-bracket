@@ -5,27 +5,38 @@
       <v-progress-linear indeterminate rounded />
     </div>
     <div v-else class="d-flex flex-column align-center">
-      <h1>Choose the restaurant you like the best!</h1>
-      <p>At the end you'll have the winner!</p>
-      <div class="d-flex" v-if="businesses.length >= 2">
-        <chooser-card
-          :info="contestants[contestantIdx]"
-          class="mr-4"
-          @click="makeChoice(contestantIdx)"
-        />
-        <chooser-card
-          :info="contestants[contestantIdx + 1]"
-          class="ml-4"
-          @click="makeChoice(contestantIdx + 1)"
+      <div v-if="!started" class="d-flex flex-column align-center">
+        <h1>Choose the restaurant you like the best!</h1>
+        <p>At the end you'll have the winner!</p>
+      </div>
+      <div
+        class="d-flex flex-column align-center"
+        v-else-if="contestants.length >= 2 && !finished && started"
+      >
+        <div class="d-flex justify-center">
+          <chooser-card
+            :info="contestants[contestantIdx]"
+            class="mr-4"
+            @click="makeChoice(contestantIdx)"
+          />
+          <chooser-card
+            :info="contestants[contestantIdx + 1]"
+            class="ml-4"
+            @click="makeChoice(contestantIdx + 1)"
+          />
+        </div>
+        <v-progress-linear
+          color="light-blue"
+          height="10"
+          :value="(progress / bracketSteps) * 100"
+          striped
+          class="mt-8"
         />
       </div>
-      <v-progress-linear
-        color="light-blue"
-        height="10"
-        :value="(progress / bracketSteps) * 100"
-        striped
-        class="mt-8"
-      />
+      <div v-else-if="finished" class="d-flex flex-column align-center">
+        <h1>Winner!</h1>
+        <chooser-card :info="contestants[0]" />
+      </div>
     </div>
   </div>
 </template>
@@ -54,7 +65,9 @@ export default {
     contestants: [],
     nextRound: [],
     businesses: [],
-    contestantIdx: 0
+    contestantIdx: 0,
+    finished: false,
+    started: false
   }),
 
   computed: {
@@ -66,6 +79,8 @@ export default {
   methods: {
     async triggerSearch() {
       this.loading = true;
+      this.started = true;
+      this.finished = false;
       const { businesses } = await server.queryRestaurants(this.search);
       this.businesses = businesses;
       this.businesses = _.shuffle(this.businesses);
@@ -86,7 +101,7 @@ export default {
       }
 
       if (this.contestants.length === 1) {
-        console.log("We have a winner!");
+        this.finished = true;
       }
     }
   }
