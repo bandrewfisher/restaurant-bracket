@@ -1,5 +1,5 @@
 <template>
-  <div class="card mb-2">
+  <div class="card mb-2" @click="$emit('click')">
     <div>
       <v-img aspect-ratio="1" width="120px" :src="info.image_url" />
     </div>
@@ -8,31 +8,20 @@
         <h3>{{ info.name }}</h3>
         <v-rating :value="info.rating" dense small readonly half-increments />
       </div>
-      <span>Address</span>
+      <span v-for="(addr, index) in info.location" :key="index">{{ addr }}</span>
       <span>{{ info.display_phone }}</span>
     </div>
   </div>
 </template>
 
 <script>
-import Joi from "@hapi/joi";
+import businessItemValidator from "../mixins";
 
 export default {
   props: {
     info: {
-      type: Object,
-      validator(val) {
-        const schema = Joi.object({
-          id: Joi.string().required(),
-          name: Joi.string().required(),
-          image_url: Joi.string().required(),
-          rating: Joi.number().required(),
-          distance: Joi.number().required(),
-          display_phone: Joi.string().required()
-        });
-        const { error } = schema.validate(val);
-        return !error;
-      }
+      required: true,
+      validator: businessItemValidator
     }
   }
 };
@@ -42,6 +31,10 @@ export default {
 .card {
   display: flex;
   height: 150px;
+}
+
+.card:hover {
+  cursor: pointer;
 }
 
 .card-header {
