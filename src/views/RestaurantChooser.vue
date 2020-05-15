@@ -43,8 +43,8 @@
 
 <script>
 import _ from "lodash";
+import { mapState, mapActions } from "vuex";
 
-import server from "../serverProxy";
 import ChooserCard from "../components/ChooserCard.vue";
 
 const BRACKET_TOTAL = 16;
@@ -64,28 +64,27 @@ export default {
     progress: 1,
     contestants: [],
     nextRound: [],
-    businesses: [],
     contestantIdx: 0,
     finished: false,
     started: false
   }),
 
   computed: {
+    ...mapState(["businesses"]),
     bracketSteps() {
       return BRACKET_TOTAL;
     }
   },
 
   methods: {
+    ...mapActions(["retrieveBusinesses"]),
     async triggerSearch() {
       this.loading = true;
       this.started = true;
       this.finished = false;
-      const { businesses } = await server.queryRestaurants(this.search);
-      this.businesses = businesses;
-      this.businesses = _.shuffle(this.businesses);
-      this.businesses = this.businesses.slice(0, BRACKET_TOTAL);
-      this.contestants = this.businesses;
+      await this.retrieveBusinesses({ search: this.search, page: 1 });
+      this.contestants = _.shuffle([...this.businesses]);
+      this.contestants = this.contestants.slice(0, BRACKET_TOTAL);
       this.loading = false;
     },
     makeChoice(index) {

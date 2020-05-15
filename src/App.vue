@@ -52,11 +52,12 @@ export default {
   },
 
   data: () => ({
-    search: ""
+    search: "",
+    businesses: []
   }),
 
   methods: {
-    searchRestaurants() {
+    async searchRestaurants() {
       if (this.$refs.home) {
         this.$refs.home.reset();
         this.$refs.home.triggerSearch();
