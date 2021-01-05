@@ -11,7 +11,7 @@
   "dependencies": {
     "@hapi/joi": "^17.1.0",
     "autoprefixer": "^9.7.4",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "core-js": "^3.6.4",
     "lodash": "^4.17.15",
     "tailwindcss": "^1.2.0",
